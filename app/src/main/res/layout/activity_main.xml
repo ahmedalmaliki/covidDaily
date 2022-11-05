@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".MainActivity">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/daily_card"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/white"
+        android:elevation="50dp"
+        app:cardCornerRadius="30dp"
+        app:layout_constraintBottom_toBottomOf="@id/dailyCard_lowerGL"
+        app:layout_constraintEnd_toEndOf="@id/dailyCard_rightGL"
+        app:layout_constraintStart_toStartOf="@id/dailyCard_leftGL"
+        app:layout_constraintTop_toBottomOf="@id/dailyCard_upperGL" />
+
+
+    <TextView
+        android:id="@+id/daily_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="50dp"
+        android:textSize="30sp"
+        android:text="Fetching data..."
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@id/daily_card"
+        app:layout_constraintStart_toStartOf="@id/daily_card"
+        app:layout_constraintTop_toBottomOf="@id/dailyCard_upperGL"
+        android:layout_margin="5dp"
+        />
+
+    <TextView
+        android:id="@+id/latest_data_update_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:elevation="50dp"
+        android:fontFamily="@font/roboto_regular"
+        android:textColor="@color/grey"
+        android:textSize="20sp"
+
+        app:layout_constraintBottom_toBottomOf="@id/dailyCard_lowerGL"
+        app:layout_constraintEnd_toEndOf="@id/daily_card"
+        app:layout_constraintStart_toStartOf="@id/daily_card"
+        app:layout_constraintTop_toBottomOf="@id/daily_count" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/dailyCard_leftGL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/dailyCard_rightGL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/dailyCard_upperGL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.2" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/dailyCard_lowerGL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
+
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="20dp"
+        android:textColor="@color/grey"
+        android:text="@string/headline"
+        android:elevation="50dp"
+        android:fontFamily="@font/roboto_medium"
+        android:textSize="20sp"
+
+        />
+
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/flag_lowerGL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.13" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
