@@ -107,8 +107,41 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.13" />
+    <TextView
+        android:id="@+id/headline2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/the_situation_of_the_last_10_days"
+        android:textColor="@color/grey"
+        app:layout_constraintTop_toTopOf="@id/dailyCard_lowerGL"
+        app:layout_constraintStart_toStartOf="@id/dailyCard_leftGL"
+        app:layout_constraintEnd_toEndOf="@id/dailyCard_rightGL"
+        android:layout_margin="10dp"/>
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/history_card"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/white"
+        android:elevation="50dp"
+        app:cardCornerRadius="30dp"
+        app:layout_constraintStart_toStartOf="@id/daily_card"
+        app:layout_constraintEnd_toEndOf="@id/daily_card"
+        app:layout_constraintTop_toBottomOf="@id/headline2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"/>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/prevTenDays_recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@id/history_card"
+        app:layout_constraintEnd_toEndOf="@id/history_card"
+        app:layout_constraintTop_toTopOf="@id/history_card"
+        app:layout_constraintBottom_toBottomOf="@id/history_card"
+        android:layout_margin="15dp"
+        android:elevation="50dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

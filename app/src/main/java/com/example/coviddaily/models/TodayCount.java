@@ -19,16 +19,8 @@ public class TodayCount {
         return count;
     }
 
-
-    public void setCount(String count) {
-        this.count = count;
-    }
-
     public String getDate() {
         return date;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
 }

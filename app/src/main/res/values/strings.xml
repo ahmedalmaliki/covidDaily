@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">CovidDaily</string>
     <string name="headline">The covid-19 situation in the United Kingdom, updated semi-daily.</string>
+    <string name="the_situation_of_the_last_10_days">The situation of the last 10 days</string>
 </resources>
