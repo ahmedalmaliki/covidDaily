@@ -26,8 +26,8 @@ public class MainViewModel extends ViewModel implements MainRepo.VolleyCallback 
 
     public void init(){
 
-        mainRepo = MainRepo.getInstance();
-        mainRepo.setActivity(getActivity());
+        mainRepo = MainRepo.getInstance(getActivity());
+
         mainRepo.setVolleyCallback(this);
         mainRepo.GetInfoFromApi();
         mTodayCount = new MutableLiveData<>();
