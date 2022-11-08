@@ -18,7 +18,7 @@ public interface HistoryDataDao {
     void update(HistoryDataEntry historyDataEntry);
     @Delete
     void delete(HistoryDataEntry historyDataEntry);
-    @Query("DELETE From LastTenDaysData")
+    @Query("DELETE From  LastTenDaysData")
     void deleteAllHistoryData();
     @Query("SELECT * From LastTenDaysData ")
     LiveData<List<HistoryDataEntry>> getAllHistoryData();

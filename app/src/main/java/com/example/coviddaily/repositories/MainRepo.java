@@ -1,15 +1,13 @@
 package com.example.coviddaily.repositories;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -18,10 +16,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import com.example.coviddaily.RequestQueueSinglton;
+import com.example.coviddaily.SharedPreference;
 import com.example.coviddaily.db.AppDataBase;
 import com.example.coviddaily.db.HistoryDataDao;
 import com.example.coviddaily.db.HistoryDataEntry;
-import com.example.coviddaily.models.TodayCount;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,34 +34,65 @@ public class MainRepo {
     private static MainRepo instance;
     private final static String TAG = "RepoDebug";
     private Context context;
-    private VolleyCallback volleyCallback;
+    private RepoCallBack repoCallBack;
     private HistoryDataDao mHistoryDataDao;
+    private LiveData<List<HistoryDataEntry>> allHistoryData;
+    private SharedPreference sharedPreferences;
 
 
 
     public  static MainRepo getInstance(Context context){
+
         if (instance == null) {
             instance = new MainRepo();
             instance.context = context;
+
+
         }
+
             return instance;
     }
 
-    public void GetInfoFromApi(){
 
+    public void getDataFromRepo() throws JSONException {
+        if(isConnectedToInternet(context)) getDataFromAPI();
+        else {
+            getDataFromDB();}
+
+    }
+
+    private void getDataFromDB() throws JSONException {
+
+        initDB();
+        initSharedPreferences();
+        passData();
+        setAlertDialog((Activity) context, "Please check your internet connection!");
+
+    }
+
+    public void getDataFromAPI(){
         String url = BASE_ENDPOINT+getParams();
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,url,null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            initDB();
-                            populateDB(getParsedJsonArray(response));
-                            Log.d(TAG, String.valueOf("llllllllllllllll"+mHistoryDataDao.getAllHistoryData()));
-                            volleyCallback.requestSuccessAlert(getParsedJsonArray(response));
+
+                            initDB(); //initiate the database connection
+                            populateDB(getParsedJsonArray(response)); //populates database with the newest history data
+                            populateSharedPreference(getParsedJsonArray(response)); //populates the local storage with current day data
+                            passData();
+
+
 
 
                         } catch (JSONException e) {
+                            try {
+                                // in case of any issues we pass the already saved data in the database
+                                passData();
+                            } catch (JSONException ex) {
+                                ex.printStackTrace();
+                            }
                             e.printStackTrace();
                         }
 
@@ -73,7 +102,12 @@ public class MainRepo {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
+                        //in case of response error
+                        try {
+                            passData();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
                         Log.d(TAG, error.toString());
 
@@ -91,16 +125,53 @@ public class MainRepo {
 
         RequestQueueSinglton.getInstance(context).addToRequestQueue(request); //queuing the request
 
+    }
+
+    private void passData() throws JSONException {
+        repoCallBack.getHistoryLiveData(allHistoryData); //after that it passes history data from db to the viewmodel through the callback interface
+        repoCallBack.getCurrentDayCountAndDate(sharedPreferences.returnCurrentCount(), //then it passes current day data to the local storage
+                sharedPreferences.returnCurrentDate());
+
+    }
+    public static boolean isConnectedToInternet(Context context)
+    {
+        // Check intenet connectivity
+        boolean connected = false;
+        try
+        {
+            ConnectivityManager conMgr = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            connected = (   conMgr.getActiveNetworkInfo() != null &&
+                    conMgr.getActiveNetworkInfo().isAvailable() &&
+                    conMgr.getActiveNetworkInfo().isConnected()   );
+        }catch (Exception e)
+        {
+            return false;
+        }
+
+        return connected;
+
+    }
+
+    private void populateSharedPreference(JSONArray jsonArray) throws JSONException {
+        initSharedPreferences();
+        sharedPreferences.saveCurrentCount(String.valueOf(jsonArray.getJSONObject(0).get("newCasesByPublishDate")));
+        sharedPreferences.saveCurrentDate(String.valueOf(jsonArray.getJSONObject(0).get("date")));
+    }
+    private void initSharedPreferences(){
+        sharedPreferences = new SharedPreference(context);
 
     }
 
     private void initDB() {
         AppDataBase db = AppDataBase.getInstance(context);
         mHistoryDataDao = db.historyDataDao();
+        allHistoryData = mHistoryDataDao.getAllHistoryData();
     }
 
     private void populateDB(JSONArray jsonArray) throws JSONException {
-        deleteAllHistoryData();
+        //adding entries to DB
+        deleteAllHistoryData(); //removing old data and adding the new
         for (int i = 1; i <= 10 ; i++ ){
             insert(new HistoryDataEntry(String.valueOf(jsonArray.getJSONObject(i).get("newCasesByPublishDate")),
                     String.valueOf(jsonArray.getJSONObject(i).get("date"))) );
@@ -121,12 +192,14 @@ public class MainRepo {
 
 
 
-   public interface VolleyCallback{
-        void requestSuccessAlert(JSONArray response) throws JSONException;
+   public interface RepoCallBack {
+        void getHistoryLiveData(LiveData<List<HistoryDataEntry>> liveData) throws JSONException;
+        void getCurrentDayCountAndDate(String count, String date);
+
    }
 
-    public void setVolleyCallback(VolleyCallback volleyCallback) {
-        this.volleyCallback = volleyCallback;
+    public void setRepoCallback(RepoCallBack repoCallBack) {
+        this.repoCallBack= repoCallBack;
     }
 
     //insert
@@ -145,11 +218,15 @@ public class MainRepo {
     public void  deleteAllHistoryData (){
         new DeleteAllHistoryDataAsyncTask(mHistoryDataDao).execute();
     }
+
+
     private static class InsertAsyncTask extends AsyncTask<HistoryDataEntry, Void, Void> {
         private  HistoryDataDao mHistoryDataDao;
 
+
         public InsertAsyncTask(HistoryDataDao mHistoryDataDao) {
             this.mHistoryDataDao = mHistoryDataDao;
+
         }
 
         @Override
@@ -157,6 +234,8 @@ public class MainRepo {
             mHistoryDataDao.insert(historyDataEntries[0]);
             return null;
         }
+
+
     }
     private static class DeleteAsyncTask extends AsyncTask<HistoryDataEntry, Void, Void> {
         private  HistoryDataDao mHistoryDataDao;
@@ -195,6 +274,18 @@ public class MainRepo {
         protected Void doInBackground(Void... voids) {
             mHistoryDataDao.deleteAllHistoryData();
             return null;
+        }
+    }
+    private void setAlertDialog(Activity context, String message) {
+        if (!context.isFinishing() ) {
+            new AlertDialog.Builder(context)
+                    .setTitle("Connection Error.")
+                    .setMessage(message)
+
+                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(android.R.string.ok, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
         }
     }
 }

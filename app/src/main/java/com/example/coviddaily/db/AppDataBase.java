@@ -47,7 +47,6 @@ public  abstract class AppDataBase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mHistoryDataDao.insert(new HistoryDataEntry("/","/"));
             return null;
         }
     }

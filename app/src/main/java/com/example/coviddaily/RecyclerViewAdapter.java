@@ -1,4 +1,4 @@
-package com.example;
+package com.example.coviddaily;
 
 import android.content.Context;
 import android.util.Log;
@@ -9,10 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.coviddaily.R;
 
 import java.util.ArrayList;
 

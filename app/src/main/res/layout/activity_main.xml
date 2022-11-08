@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:elevation="50dp"
         android:textSize="30sp"
-        android:text="Fetching data..."
+        android:text="@string/fetching_data"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="@id/daily_card"
         app:layout_constraintStart_toStartOf="@id/daily_card"
@@ -40,7 +40,7 @@
         />
 
     <TextView
-        android:id="@+id/latest_data_update_date"
+        android:id="@+id/latest_data_update_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -113,6 +113,7 @@
         android:layout_height="wrap_content"
         android:text="@string/the_situation_of_the_last_10_days"
         android:textColor="@color/grey"
+        android:fontFamily="@font/roboto_medium"
         app:layout_constraintTop_toTopOf="@id/dailyCard_lowerGL"
         app:layout_constraintStart_toStartOf="@id/dailyCard_leftGL"
         app:layout_constraintEnd_toEndOf="@id/dailyCard_rightGL"
